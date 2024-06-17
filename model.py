@@ -24,8 +24,9 @@ def init_llm():
     Settings.llm = llm
     Settings.embed_model = embed_model
 
+
 def init_index(embed_model):
-    reader = SimpleDirectoryReader(input_dir="/home/yago/mobat_project/mobat_app/Sheets", recursive=True)
+    reader = SimpleDirectoryReader(input_dir="./docs", recursive=True)
     documents = reader.load_data()
 
     logging.info("index creating with `%d` documents", len(documents))
@@ -36,9 +37,13 @@ def init_index(embed_model):
     vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
+    # use this to set custom chunk size and splitting
+    # https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/
+
     index = VectorStoreIndex.from_documents(documents, storage_context=storage_context, embed_model=embed_model)
 
     return index
+
 
 def init_query_engine(index):
     global query_engine
@@ -66,15 +71,30 @@ def init_query_engine(index):
 
     return query_engine
 
+
 def chat(input_question, user):
     global query_engine
 
-    if query_engine is not None:
+    response = query_engine.query(input_question)
+    logging.info("got response from llm - %s", response)
+
+    return response.response
+
+
+def chat_cmd():
+    global query_engine
+
+    while True:
+        input_question = input("Enter your question (or 'exit' to quit): ")
+        if input_question.lower() == 'exit':
+            break
+
         response = query_engine.query(input_question)
         logging.info("got response from llm - %s", response)
-        return response.response
-    else:
-        logging.error("Query engine is not initialized")
-        return "Error: Query engine is not initialized"
 
 
+if __name__ == '__main__':
+    init_llm()
+    index = init_index(Settings.embed_model)
+    init_query_engine(index)
+    chat_cmd()

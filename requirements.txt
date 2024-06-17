@@ -14,5 +14,7 @@ unstructured[local-inference]
 llama-index
 llama-index-llms-ollama
 llama-index-embeddings-huggingface
-llama-index-vector-stores-chroma
 torch
+
+# manually install below module to get rid of dependency install issues with `requirements.txt`
+# pip install llama-index-vector-stores-chroma

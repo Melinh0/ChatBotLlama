@@ -42,4 +42,4 @@ if __name__ == '__main__':
         logging.error("Initialization error: %s", str(e))
         sys.exit(1)
 
-    app.run(host='0.0.0.0', port=HTTP_PORT, debug=True)
+    app.run(host='0.0.0.0', port=int(HTTP_PORT), debug=True)
